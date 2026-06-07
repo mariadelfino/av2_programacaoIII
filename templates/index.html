@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblioteca Digital ADS</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">📚 Biblioteca Digital ADS</div>
+      <nav class="nav">
+        <button class="nav-btn active" onclick="showPage('dashboard')">🏠 Dashboard</button>
+        <button class="nav-btn" onclick="showPage('livros')">📖 Livros</button>
+        <button class="nav-btn" onclick="showPage('categorias')">🗂️ Categorias</button>
+        <button class="nav-btn" onclick="showPage('usuarios')">👥 Usuários</button>
+        <button class="nav-btn" onclick="showPage('emprestimos')">📋 Empréstimos</button>
+        <button class="nav-btn" onclick="showPage('rpa')">🤖 RPA</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page active">
+      <h1 class="page-title">Dashboard</h1>
+      <div class="cards-grid" id="dashboard-cards">
+        <div class="card stat-card">
+          <div class="stat-icon">📚</div>
+          <div class="stat-info">
+            <span class="stat-label">Total de Livros</span>
+            <span class="stat-value" id="stat-livros">–</span>
+          </div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-label">Usuários Cadastrados</span>
+            <span class="stat-value" id="stat-usuarios">–</span>
+          </div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <span class="stat-label">Empréstimos Ativos</span>
+            <span class="stat-value" id="stat-emprestimos">–</span>
+          </div>
+        </div>
+        <div class="card stat-card stat-danger">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-info">
+            <span class="stat-label">Em Atraso</span>
+            <span class="stat-value" id="stat-atrasados">–</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVROS -->
+    <section id="page-livros" class="page">
+      <div class="page-header">
+        <h1 class="page-title">📖 Livros</h1>
+        <button class="btn btn-primary" onclick="abrirModal('modal-livro')">+ Novo Livro</button>
+      </div>
+
+      <div class="filtros">
+        <input type="text" id="filtro-titulo" placeholder="Buscar por título..." class="input" />
+        <input type="text" id="filtro-autor" placeholder="Buscar por autor..." class="input" />
+        <select id="filtro-categoria" class="input">
+          <option value="">Todas as categorias</option>
+        </select>
+        <label class="checkbox-label">
+          <input type="checkbox" id="filtro-disponivel" onchange="carregarLivros()" />
+          Apenas disponíveis
+        </label>
+        <button class="btn btn-secondary" onclick="carregarLivros()">🔍 Filtrar</button>
+      </div>
+
+      <div class="table-container">
+        <table class="table" id="tabela-livros">
+          <thead>
+            <tr><th>ID</th><th>Título</th><th>Autor</th><th>Categoria</th><th>Ano</th><th>Disponível</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="tbody-livros"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section id="page-categorias" class="page">
+      <div class="page-header">
+        <h1 class="page-title">🗂️ Categorias</h1>
+        <button class="btn btn-primary" onclick="abrirModal('modal-categoria')">+ Nova Categoria</button>
+      </div>
+      <div class="cards-grid" id="grid-categorias"></div>
+    </section>
+
+    <!-- USUARIOS -->
+    <section id="page-usuarios" class="page">
+      <div class="page-header">
+        <h1 class="page-title">👥 Usuários</h1>
+        <button class="btn btn-primary" onclick="abrirModal('modal-usuario')">+ Novo Usuário</button>
+      </div>
+      <div class="filtros">
+        <input type="text" id="filtro-usuario-nome" placeholder="Buscar por nome..." class="input" />
+        <button class="btn btn-secondary" onclick="carregarUsuarios()">🔍 Filtrar</button>
+      </div>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr><th>ID</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Empréstimos</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="tbody-usuarios"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- EMPRESTIMOS -->
+    <section id="page-emprestimos" class="page">
+      <div class="page-header">
+        <h1 class="page-title">📋 Empréstimos</h1>
+        <button class="btn btn-primary" onclick="abrirModal('modal-emprestimo')">+ Novo Empréstimo</button>
+      </div>
+      <div class="filtros">
+        <select id="filtro-status" class="input" onchange="carregarEmprestimos()">
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativo</option>
+          <option value="devolvido">Devolvido</option>
+          <option value="atrasado">Atrasado</option>
+        </select>
+      </div>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr><th>ID</th><th>Livro</th><th>Usuário</th><th>Empréstimo</th><th>Devolução</th><th>Status</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="tbody-emprestimos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- RPA -->
+    <section id="page-rpa" class="page">
+      <h1 class="page-title">🤖 Automação RPA</h1>
+      <div class="rpa-grid">
+        <div class="card rpa-card">
+          <h2>📧 Notificação por E-mail</h2>
+          <p>Envia e-mail de confirmação de empréstimo para o usuário.</p>
+          <div class="form-group">
+            <label>ID do Empréstimo</label>
+            <input type="number" id="rpa-email-id" class="input" placeholder="Ex: 1" />
+          </div>
+          <div class="form-group">
+            <label>E-mail (opcional — usa o do usuário se vazio)</label>
+            <input type="email" id="rpa-email-dest" class="input" placeholder="destino@email.com" />
+          </div>
+          <button class="btn btn-primary" onclick="enviarEmail()">📤 Enviar E-mail</button>
+          <div id="rpa-email-resultado" class="resultado"></div>
+        </div>
+
+        <div class="card rpa-card">
+          <h2>📱 Notificação por WhatsApp</h2>
+          <p>Envia mensagem via WhatsApp Web para o usuário do empréstimo.</p>
+          <div class="form-group">
+            <label>ID do Empréstimo</label>
+            <input type="number" id="rpa-wpp-id" class="input" placeholder="Ex: 1" />
+          </div>
+          <div class="form-group">
+            <label>Telefone (com DDD e DDI, sem +)</label>
+            <input type="text" id="rpa-wpp-tel" class="input" placeholder="5511999990001" />
+          </div>
+          <button class="btn btn-whatsapp" onclick="enviarWhatsApp()">📱 Enviar WhatsApp</button>
+          <div id="rpa-wpp-resultado" class="resultado"></div>
+        </div>
+
+        <div class="card rpa-card" style="grid-column: 1 / -1;">
+          <h2>📄 Log de Automações</h2>
+          <pre id="rpa-log" class="log-box">Carregando log...</pre>
+          <button class="btn btn-secondary" onclick="carregarLog()">🔄 Atualizar Log</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── MODAIS ─────────────────────────────────────────────────────────── -->
+
+  <!-- Modal Livro -->
+  <div id="modal-livro" class="modal-overlay" onclick="fecharModalOverlay(event, 'modal-livro')">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-livro-titulo">Novo Livro</h2>
+        <button class="modal-close" onclick="fecharModal('modal-livro')">✕</button>
+      </div>
+      <form id="form-livro" onsubmit="salvarLivro(event)">
+        <input type="hidden" id="livro-id" />
+        <div class="form-group"><label>Título *</label><input type="text" id="livro-titulo" class="input" required /></div>
+        <div class="form-group"><label>Autor *</label><input type="text" id="livro-autor" class="input" required /></div>
+        <div class="form-group"><label>ISBN</label><input type="text" id="livro-isbn" class="input" /></div>
+        <div class="form-row">
+          <div class="form-group"><label>Ano de Publicação</label><input type="number" id="livro-ano" class="input" min="1000" max="2099" /></div>
+          <div class="form-group"><label>Quantidade *</label><input type="number" id="livro-quantidade" class="input" min="1" value="1" required /></div>
+        </div>
+        <div class="form-group">
+          <label>Categoria *</label>
+          <select id="livro-categoria" class="input" required></select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="fecharModal('modal-livro')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Categoria -->
+  <div id="modal-categoria" class="modal-overlay" onclick="fecharModalOverlay(event, 'modal-categoria')">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-categoria-titulo">Nova Categoria</h2>
+        <button class="modal-close" onclick="fecharModal('modal-categoria')">✕</button>
+      </div>
+      <form id="form-categoria" onsubmit="salvarCategoria(event)">
+        <input type="hidden" id="categoria-id" />
+        <div class="form-group"><label>Nome *</label><input type="text" id="categoria-nome" class="input" required /></div>
+        <div class="form-group"><label>Descrição</label><textarea id="categoria-descricao" class="input" rows="3"></textarea></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="fecharModal('modal-categoria')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Usuário -->
+  <div id="modal-usuario" class="modal-overlay" onclick="fecharModalOverlay(event, 'modal-usuario')">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-usuario-titulo">Novo Usuário</h2>
+        <button class="modal-close" onclick="fecharModal('modal-usuario')">✕</button>
+      </div>
+      <form id="form-usuario" onsubmit="salvarUsuario(event)">
+        <input type="hidden" id="usuario-id" />
+        <div class="form-group"><label>Nome *</label><input type="text" id="usuario-nome" class="input" required /></div>
+        <div class="form-group"><label>E-mail *</label><input type="email" id="usuario-email" class="input" required /></div>
+        <div class="form-group"><label>Telefone (com DDI, ex: 5511999990001)</label><input type="text" id="usuario-telefone" class="input" /></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="fecharModal('modal-usuario')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Empréstimo -->
+  <div id="modal-emprestimo" class="modal-overlay" onclick="fecharModalOverlay(event, 'modal-emprestimo')">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Novo Empréstimo</h2>
+        <button class="modal-close" onclick="fecharModal('modal-emprestimo')">✕</button>
+      </div>
+      <form id="form-emprestimo" onsubmit="salvarEmprestimo(event)">
+        <div class="form-group">
+          <label>Livro *</label>
+          <select id="emp-livro" class="input" required></select>
+        </div>
+        <div class="form-group">
+          <label>Usuário *</label>
+          <select id="emp-usuario" class="input" required></select>
+        </div>
+        <div class="form-group">
+          <label>Data de Devolução Prevista *</label>
+          <input type="date" id="emp-devolucao" class="input" required />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="fecharModal('modal-emprestimo')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar Empréstimo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── CHATBOT ────────────────────────────────────────────────────────── -->
+  <div id="chatbot-widget">
+    <button id="chatbot-toggle" onclick="toggleChat()">💬</button>
+    <div id="chatbot-box" class="chatbot-box hidden">
+      <div class="chatbot-header">
+        <span>🤖 Assistente da Biblioteca</span>
+        <button onclick="toggleChat()">✕</button>
+      </div>
+      <div id="chatbot-messages" class="chatbot-messages"></div>
+      <div class="chatbot-input-area">
+        <input type="text" id="chatbot-input" class="input" placeholder="Digite sua dúvida..."
+               onkeydown="if(event.key==='Enter') enviarMensagem()" />
+        <button class="btn btn-primary" onclick="enviarMensagem()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
