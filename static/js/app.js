@@ -54,10 +54,12 @@ async function api(url, opts = {}) {
 async function carregarDashboard() {
   try {
     const d = await api('/api/dashboard');
-    document.getElementById('stat-livros').textContent      = d.total_livros;
-    document.getElementById('stat-usuarios').textContent    = d.total_usuarios;
-    document.getElementById('stat-emprestimos').textContent = d.emprestimos_ativos;
-    document.getElementById('stat-atrasados').textContent   = d.emprestimos_atrasados;
+    document.getElementById('stat-livros').textContent       = d.total_livros;
+    document.getElementById('stat-usuarios').textContent     = d.total_usuarios;
+    document.getElementById('stat-categorias').textContent   = d.total_categorias;
+    document.getElementById('stat-emprestimos').textContent  = d.emprestimos_ativos;
+    document.getElementById('stat-atrasados').textContent    = d.emprestimos_atrasados;
+    document.getElementById('stat-devolvidos').textContent   = d.emprestimos_devolvidos;
   } catch (e) { console.error(e); }
 }
 

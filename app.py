@@ -339,16 +339,20 @@ def chatbot():
 def dashboard():
     total_livros = Livro.query.count()
     total_usuarios = Usuario.query.count()
+    total_categorias = Categoria.query.count()
     emprestimos_ativos = Emprestimo.query.filter_by(status='ativo').count()
     emprestimos_atrasados = Emprestimo.query.filter(
         Emprestimo.status == 'ativo',
         Emprestimo.data_devolucao_prevista < date.today()
     ).count()
+    emprestimos_devolvidos = Emprestimo.query.filter_by(status='devolvido').count()
     return jsonify({
         'total_livros': total_livros,
         'total_usuarios': total_usuarios,
+        'total_categorias': total_categorias,
         'emprestimos_ativos': emprestimos_ativos,
-        'emprestimos_atrasados': emprestimos_atrasados
+        'emprestimos_atrasados': emprestimos_atrasados,
+        'emprestimos_devolvidos': emprestimos_devolvidos,
     }), 200
 
 
