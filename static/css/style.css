@@ -19,8 +19,23 @@
   --shadow-md: 0 4px 12px rgba(0,0,0,.15);
 }
 
+:root {
+  --radius:  8px;
+  --shadow:  0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.15);
+  --rosa-claro: #FFE5EE;
+  --rosa: #EAB9CE;
+  --rosa-meio-claro: #D2C2C7;
+  --cinza: #E4E1E6;
+  --roxo: #D6BAFF;
+  --roxo-escuro: #9B8D92;
+  --cinza-rosado: #4F4448;
+  --fundo-preto: #131316;
+  --fundo-branco: #F2F2F2;
+}
+
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Newsreader', 'Courier Prime', 'Jacquarda Bastarda 9', serif;
   background: var(--gray-50);
   color: var(--gray-900);
   min-height: 100vh;
