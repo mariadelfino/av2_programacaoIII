@@ -54,10 +54,12 @@ async function api(url, opts = {}) {
 async function carregarDashboard() {
   try {
     const d = await api('/api/dashboard');
-    document.getElementById('stat-livros').textContent      = d.total_livros;
-    document.getElementById('stat-usuarios').textContent    = d.total_usuarios;
-    document.getElementById('stat-emprestimos').textContent = d.emprestimos_ativos;
-    document.getElementById('stat-atrasados').textContent   = d.emprestimos_atrasados;
+    document.getElementById('stat-livros').textContent       = d.total_livros;
+    document.getElementById('stat-usuarios').textContent     = d.total_usuarios;
+    document.getElementById('stat-categorias').textContent   = d.total_categorias;
+    document.getElementById('stat-emprestimos').textContent  = d.emprestimos_ativos;
+    document.getElementById('stat-atrasados').textContent    = d.emprestimos_atrasados;
+    document.getElementById('stat-devolvidos').textContent   = d.emprestimos_devolvidos;
   } catch (e) { console.error(e); }
 }
 
@@ -68,16 +70,16 @@ async function carregarCategorias() {
   _categorias = await api('/api/categorias');
   const grid = document.getElementById('grid-categorias');
   grid.innerHTML = _categorias.map(c => `
-    <div class="card cat-card">
-      <h3>${esc(c.nome)}</h3>
-      <p>${esc(c.descricao || '—')}</p>
-      <span class="badge badge-blue">${c.total_livros} livro(s)</span>
-      <div class="actions">
-        <button class="btn btn-secondary btn-sm" onclick="editarCategoria(${c.id})">✏️ Editar</button>
-        <button class="btn btn-danger btn-sm" onclick="deletarCategoria(${c.id})">🗑️</button>
+    <div class="dark-cat-card">
+      <span class="dark-cat-count">${c.total_livros} livro(s)</span>
+      <h3 class="dark-cat-name">${esc(c.nome)}</h3>
+      <p class="dark-cat-desc">${esc(c.descricao || '—')}</p>
+      <div class="dark-cat-footer">
+        <button class="book-btn-icon" onclick="editarCategoria(${c.id})" title="Editar">✎</button>
+        <button class="book-btn-icon danger" onclick="deletarCategoria(${c.id})" title="Remover">✕</button>
       </div>
     </div>
-  `).join('');
+  `).join('') || '<div class="livros-empty">>> nenhuma categoria encontrada.</div>';
 }
 
 function abrirModal_categoria_limpo() {
@@ -146,32 +148,32 @@ async function carregarLivros() {
 
   try {
     const livros = await api(url);
-    const tbody = document.getElementById('tbody-livros');
-    tbody.innerHTML = livros.map(l => `
-      <tr>
-        <td>${l.id}</td>
-        <td><strong>${esc(l.titulo)}</strong></td>
-        <td>${esc(l.autor)}</td>
-        <td><span class="badge badge-blue">${esc(l.categoria || '—')}</span></td>
-        <td>${l.ano_publicacao || '—'}</td>
-        <td>
-          <span class="badge ${l.disponivel > 0 ? 'badge-green' : 'badge-red'}">
-            ${l.disponivel}/${l.quantidade}
-          </span>
-        </td>
-        <td>
-          <button class="btn btn-secondary btn-sm" onclick="editarLivro(${l.id})">✏️</button>
-          <button class="btn btn-danger btn-sm" onclick="deletarLivro(${l.id})">🗑️</button>
-        </td>
-      </tr>
-    `).join('') || '<tr><td colspan="7" style="text-align:center;color:#999;padding:24px">Nenhum livro encontrado.</td></tr>';
+    const grid = document.getElementById('grid-livros');
+    grid.innerHTML = livros.map(l => {
+      const meta = `> ${esc((l.categoria || 'SEM CATEGORIA').toUpperCase())} | ${l.ano_publicacao || '—'}`;
+      const dispText = `${l.disponivel}/${l.quantidade} DISPONÍVEL`;
+      return `
+        <div class="book-card">
+          <span class="book-card-id">ID: ${String(l.id).padStart(3, '0')}</span>
+          <span class="book-meta">${meta}</span>
+          <span class="book-title">${esc(l.titulo)}</span>
+          <span class="book-author">${esc(l.autor)}</span>
+          <div class="book-footer">
+            <span class="book-availability">${dispText}</span>
+            <div class="book-actions">
+              <button class="book-btn-icon" onclick="editarLivro(${l.id})" title="Editar">✎</button>
+              <button class="book-btn-icon danger" onclick="deletarLivro(${l.id})" title="Remover">✕</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('') || '<div class="livros-empty">>> nenhum livro encontrado.</div>';
 
     // Preenche filtro de categorias
-    const sel = document.getElementById('filtro-categoria');
-    if (sel && _categorias.length === 0) {
+    if (_categorias.length === 0) {
       _categorias = await api('/api/categorias');
     }
-    popularSelectCategorias('filtro-categoria');
+    popularSelectCategorias('filtro-categoria', catId);
     popularSelectCategorias('livro-categoria');
   } catch (err) { console.error(err); }
 }
@@ -259,11 +261,13 @@ async function carregarUsuarios() {
       <td>${esc(u.telefone || '—')}</td>
       <td><span class="badge badge-blue">${u.total_emprestimos}</span></td>
       <td>
-        <button class="btn btn-secondary btn-sm" onclick="editarUsuario(${u.id})">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="deletarUsuario(${u.id})">🗑️</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="book-btn-icon" onclick="editarUsuario(${u.id})" title="Editar">✎</button>
+          <button class="book-btn-icon danger" onclick="deletarUsuario(${u.id})" title="Remover">✕</button>
+        </div>
       </td>
     </tr>
-  `).join('') || '<tr><td colspan="6" style="text-align:center;color:#999;padding:24px">Nenhum usuário.</td></tr>';
+  `).join('') || '<tr><td colspan="6" class="dark-table-empty">>> nenhum usuário encontrado.</td></tr>';
 }
 
 async function editarUsuario(id) {
@@ -329,15 +333,17 @@ async function carregarEmprestimos() {
         <td>${esc(e.livro || '—')}</td>
         <td>${esc(e.usuario || '—')}</td>
         <td>${e.data_emprestimo || '—'}</td>
-        <td style="${atrasado ? 'color:var(--red);font-weight:600' : ''}">${e.data_devolucao_prevista || '—'}</td>
+        <td style="${atrasado ? 'color:#ff7b71;font-weight:600' : ''}">${e.data_devolucao_prevista || '—'}</td>
         <td><span class="badge ${badges[e.status] || 'badge-gray'}">${e.status}</span></td>
         <td>
-          ${e.status === 'ativo' ? `<button class="btn btn-success btn-sm" onclick="devolverLivro(${e.id})">✅ Devolver</button>` : ''}
-          <button class="btn btn-danger btn-sm" onclick="deletarEmprestimo(${e.id})">🗑️</button>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${e.status === 'ativo' ? `<button class="tbl-action-btn" onclick="devolverLivro(${e.id})">devolver</button>` : ''}
+            <button class="book-btn-icon danger" onclick="deletarEmprestimo(${e.id})" title="Remover">✕</button>
+          </div>
         </td>
       </tr>
     `;
-  }).join('') || '<tr><td colspan="7" style="text-align:center;color:#999;padding:24px">Nenhum empréstimo.</td></tr>';
+  }).join('') || '<tr><td colspan="7" class="dark-table-empty">>> nenhum empréstimo encontrado.</td></tr>';
 }
 
 async function abrirModalEmprestimo() {
